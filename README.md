@@ -1,7 +1,13 @@
 # Neovim 配置文件
 
-## 安装
+依赖:
 
+- git
+- Neovim
+- HomeBrew
+- iTerm2
+
+## 安装
 
 ### 1. 下载配置
 
