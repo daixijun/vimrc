@@ -140,11 +140,29 @@ let g:airline_powerline_fonts = 1        " 启用powerline样式字体
 " let g:airline_section_error = '%{exists("ALEGetStatusLine") ? ALEGetStatusLine() : ""}'
 
 " 代替YCM 自动补全
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
 " let g:python_host_prog = expand("~/.pyenv/versions/2.7.14/bin/python")
-let g:python3_host_prog = "/usr/local/bin/python3"
-let &runtimepath .= "~/.local/share/nvim/plugged/deoplete.nvim/"
+" let g:python3_host_prog = "/usr/local/bin/python3"
+set runtimepath += "~/.local/share/nvim/plugged/deoplete.nvim/"
 let g:deoplete#enable_at_startup = 1
+" Terraform
+let g:deoplete#omni_patterns = {}
+let g:deoplete#omni_patterns.terraform = '[^ *\t"{=$]\w*'
+" call deoplete#custom#option({
+" \  'auto_complete': v:true,
+" \  'omni_patterns': {
+" \    'complete_method': 'omnifunc',
+" \    'terraform': '[^ *\t"{=$]\w*',
+" \  },
+" \  'complete_method': 'complete',
+" \})
+" call deoplete#initialize()
 
 Plug 'zchee/deoplete-jedi'
 
@@ -168,16 +186,16 @@ let g:ale_linters = {
 \   "python": ["flake8"],
 \   'javascript': ['eslint'],
 \}
-let g:ale_python_flake8_executable = '/usr/local/bin/flake8'
+" let g:ale_python_flake8_executable = '/usr/local/bin/flake8'
 let g:ale_python_flake8_args = '--max-line-length=160'
 let g:ale_open_list = 1
 " Set this if you want to.
 " This can be useful if you are combining ALE with
 " some other plugin which sets quickfix errors, etc.
 " let g:ale_keep_list_window_open = 1
-set statusline+=%{ALEGetStatusLine()}
+" set statusline+=%{ALEGetStatusLine()}
 
-" Plug 'willthames/ansible-lint'
+Plug 'willthames/ansible-lint'
 
 Plug 'daixijun/vim-header'
 let g:header_field_filename = 1
@@ -366,7 +384,8 @@ let g:NERDDefaultAlign = 'left'
 let g:NERDAltDelims_java = 1
 " Add your own custom formats or override the defaults
 let g:NERDCustomDelimiters = {
-    \ 'c': {'left': '"'}
+    \ 'c': {'left': '"'},
+    \ 'vim': {'left': '"'}
     \ }
 " Allow commenting and inverting empty lines (useful when commenting a region)
 let g:NERDCommentEmptyLines = 1
@@ -403,6 +422,23 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 " Plugin options
 Plug 'nsf/gocode', { 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' }
+
+" Terraform
+Plug 'hashivim/vim-terraform'
+let g:terraform_align=1
+let g:terraform_fold_sections=1
+
+" Terraform 自动补全
+Plug 'juliosueiras/vim-terraform-completion'
+" (Optional) Enable terraform plan to be include in filter
+" let g:syntastic_terraform_tffilter_plan = 1
+" (Optional) Default: 0, enable(1)/disable(0) plugin's keymapping
+"let g:terraform_completion_keys = 1
+" (Optional) Default: 1, enable(1)/disable(0) terraform module registry completion
+"let g:terraform_registry_module_completion = 0
+
+Plug 'neomake/neomake'
+
 call plug#end()
 
 syntax enable
@@ -413,3 +449,8 @@ endif
 colorscheme onedark
 " colorscheme OceanicNext
 set background=dark  " 设置背景颜色，也可设置为light
+" (Optional)Remove Info(Preview) window
+set completeopt-=preview
+" (Optional)Hide Info(Preview) window after completions
+autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
