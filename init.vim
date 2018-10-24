@@ -81,6 +81,10 @@ vnoremap <Leader>s :sort<CR>
 vnoremap <s-tab> <gv         " 取消缩进
 vnoremap <tab> >gv           " 缩进
 
+" complete
+inoremap <C-j>  <C-n>
+inoremap <C-k>  <C-p>
+
 " 将光标移到行首
 " imap <c-a> <ESC>I
 " 将光标移到行尾
@@ -98,10 +102,10 @@ autocmd FileType yaml set ts=2 sw=2 sts=2 et
 
 " Enable syntax highlighting
 " You need to reload this file for the change to apply
-filetype on                     " 检测文件类型
-filetype indent on              " 载入特定文件类型缩进插件
-filetype plugin on              " 载入特定文件类型插件
-syntax on                       "
+" 按文件类型加载插件及设置缩进
+filetype plugin indent on
+" 开启语法高亮
+syntax enable
 
 " 每行超过160个的字符用下划线标示
 au BufRead,BufNewFile *.s,*.c,*.cpp,*.h,*.cl,*.rb,*.sql,*.sh,*.vim,*.js,*.css,*.html,*.py 2match Underlined /.\%161v/
@@ -137,7 +141,7 @@ let g:airline#extensions#ale#error_symbol = 'E:'
 let g:airline#extensions#ale#warning_symbol = 'W:'
 let g:airline_powerline_fonts = 1        " 启用powerline样式字体
 " let g:airline_section_b = '%{strftime("%Y-%m-%d %H:%M:%S")}'
-" let g:airline_section_error = '%{exists("ALEGetStatusLine") ? ALEGetStatusLine() : ""}'
+let g:airline_section_error = '%{exists("ALEGetStatusLine") ? ALEGetStatusLine() : ""}'
 
 " 代替YCM 自动补全
 if has('nvim')
@@ -150,10 +154,12 @@ endif
 " let g:python_host_prog = expand("~/.pyenv/versions/2.7.14/bin/python")
 " let g:python3_host_prog = "/usr/local/bin/python3"
 set runtimepath += "~/.local/share/nvim/plugged/deoplete.nvim/"
+" Use deoplete.
 let g:deoplete#enable_at_startup = 1
 " Terraform
 let g:deoplete#omni_patterns = {}
 let g:deoplete#omni_patterns.terraform = '[^ *\t"{=$]\w*'
+" let g:deoplete#omni_patterns.complete_method = 'complete'
 " call deoplete#custom#option({
 " \  'auto_complete': v:true,
 " \  'omni_patterns': {
@@ -164,7 +170,7 @@ let g:deoplete#omni_patterns.terraform = '[^ *\t"{=$]\w*'
 " \})
 " call deoplete#initialize()
 
-Plug 'zchee/deoplete-jedi'
+Plug 'zchee/deoplete-jedi', { 'for': 'python'}
 
 Plug 'w0rp/ale'
 " let &runtimepath .= ",~/.local/share/nvim/plugged/ale"
@@ -175,6 +181,8 @@ let g:ale_enabled = 1
 " let g:ale_echo_msg_warning_str = 'W'
 let g:ale_sign_error = '>>'
 let g:ale_sign_warning = '--'
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_lint_on_save = 1
 " let g:ale_set_loclist = 0
@@ -185,7 +193,14 @@ let g:ale_lint_on_insert_leave = 0
 let g:ale_linters = {
 \   "python": ["flake8"],
 \   'javascript': ['eslint'],
+\   'yaml.ansible': ['ansible-lint'],
 \}
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'javascript': ['eslint'],
+\}
+" Set this variable to 1 to fix files when you save them.
+let g:ale_fix_on_save = 1
 " let g:ale_python_flake8_executable = '/usr/local/bin/flake8'
 let g:ale_python_flake8_args = '--max-line-length=160'
 let g:ale_open_list = 1
@@ -194,17 +209,6 @@ let g:ale_open_list = 1
 " some other plugin which sets quickfix errors, etc.
 " let g:ale_keep_list_window_open = 1
 " set statusline+=%{ALEGetStatusLine()}
-
-Plug 'willthames/ansible-lint'
-
-Plug 'daixijun/vim-header'
-let g:header_field_filename = 1
-let g:header_field_author = '戴喜军'
-let g:header_field_author_email = 'daixijun1990@gmail.com'
-let g:header_field_timestamp = 1
-let g:header_field_timestamp_format = '%Y-%m-%d %H:%M:%S'
-autocmd BufNewFile *.c,*.cpp,*.h,*.css,*.py,*.ruby,*.sh,*.php,*.pl,*.perl,*.lua,*.js,*.jsx,*.java AddHeader
-
 
 Plug 'ryanoasis/vim-devicons'
 " loading the plugin
@@ -232,9 +236,11 @@ let g:indentLine_color_dark = 1
 Plug 'hdima/python-syntax'
 let python_highlight_all = 1
 
-Plug 'pearofducks/ansible-vim'
+" Ansible
+Plug 'willthames/ansible-lint', { 'for': 'ansible' }
+Plug 'pearofducks/ansible-vim', { 'do': 'cd ./UltiSnips; ./generate.py' }
 let g:ansible_unindent_after_newline = 1
-let g:ansible_attribute_highlight = "ob"
+let g:ansible_attribute_highlight = "od"
     " a: highlight all instances of key=
     " o: highlight only instances of key= found on newlines
     " d: dim the instances of key= found
@@ -244,21 +250,26 @@ let g:ansible_name_highlight = 'd'
     " d: dim the instances of name: found
     " b: brighten the instances of name: found
 let g:ansible_extra_keywords_highlight = 1
+let g:ansible_normal_keywords_highlight = 'Constant'
+let g:ansible_with_keywords_highlight = 'Constant'
 
+" Saltstack
 Plug 'saltstack/salt-vim'
 
 Plug 'sgur/vim-editorconfig'
 
 Plug 'tpope/vim-surround'
 
-Plug 'tpope/vim-markdown'
+Plug 'tpope/vim-markdown', {'for': 'markdown'}
 autocmd BufNewFile,BufReadPost *.md,*.markdown set filetype=markdown
 
-Plug 'posva/vim-vue'
+" VUE && JS && TS
+Plug 'posva/vim-vue', {'for': 'vue'}
+autocmd BufNewFile,BufReadPost *.vue set filetype=vue
 Plug 'othree/es.next.syntax.vim'
 Plug 'othree/yajs'
 
-Plug 'elzr/vim-json'
+Plug 'elzr/vim-json', {'for': 'json'}
 let g:vim_json_syntax_conceal = 0
 " let g:vim_json_syntax_concealcursor = 'nvc'
 
@@ -352,6 +363,7 @@ Plug 'sjl/gundo.vim'
 let g:gundo_preview_height = 40
 let g:gundo_width = 24
 
+" 文件查找
 Plug 'kien/ctrlp.vim'
 let g:ctrlp_max_height = 30
 set wildignore+=*.pyc
@@ -360,6 +372,7 @@ set wildignore+=*/coverage/*
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.png,*.jpg,*.jpeg,*.gif
 let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 
+" Git
 Plug 'tpope/vim-fugitive'
 set statusline+=%{fugitive#statusline()} "
 
@@ -369,10 +382,7 @@ let g:gitgutter_map_keys = 0
 let g:gitgutter_enabled = 1
 let g:gitgutter_highlight_lines = 0
 
-" Plug 'lambdalisue/vim-django-support'
-
-" Plug 'lambdalisue/vim-pyenv'
-
+" 注释
 Plug 'scrooloose/nerdcommenter'
 " Add spaces after comment delimiters by default
 let g:NERDSpaceDelims = 1
@@ -417,10 +427,9 @@ Plug 'BtPht/python_editing'
 
 " Plug 'bling/vim-bufferline'
 
+" Golang
 " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-
-" Plugin options
 Plug 'nsf/gocode', { 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' }
 
 " Terraform
@@ -437,6 +446,7 @@ Plug 'juliosueiras/vim-terraform-completion'
 " (Optional) Default: 1, enable(1)/disable(0) terraform module registry completion
 "let g:terraform_registry_module_completion = 0
 
+" 异步编译
 Plug 'neomake/neomake'
 
 call plug#end()
@@ -445,6 +455,7 @@ syntax enable
 if has("termguicolors")
     set termguicolors
 endif
+" 主题样式
 " colorscheme gruvbox
 colorscheme onedark
 " colorscheme OceanicNext
