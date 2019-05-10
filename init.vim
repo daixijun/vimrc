@@ -15,7 +15,7 @@ set cmdheight=2              " 命令行的高度，默认为1，这里设为2
 set history=700              " 保存700条记录
 set undolevels=700           " 可回退700步
 set number                   " 显示行号
-"set relativenumber           " 显示相对行号
+set relativenumber           " 显示相对行号
 set tw=159                   " 每行字符长度
 set nowrap                   " 不自动换行
 set fo-=t                    " don't automatically wrap text when typing
@@ -151,8 +151,8 @@ else
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
-" let g:python_host_prog = expand("~/.pyenv/versions/2.7.14/bin/python")
-" let g:python3_host_prog = "/usr/local/bin/python3"
+let g:python_host_prog = "/usr/local/bin/python"
+let g:python3_host_prog = "/usr/local/bin/python3"
 set runtimepath += "~/.local/share/nvim/plugged/deoplete.nvim/"
 " Use deoplete.
 let g:deoplete#enable_at_startup = 1
