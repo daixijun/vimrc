@@ -14,7 +14,7 @@
 ```bash
 mkdir -p ${HOME}/.config/nvim/
 git clone https://github.com/daixijun/vimrc.git
-ln -sf `pwd`/init.vim ${HOME}/.config/nvim/init.vim
+ln -sf `pwd`/vimrc/init.vim ${HOME}/.config/nvim/init.vim
 ```
 
 ### 2. 安装Plugin
@@ -49,4 +49,3 @@ brew cask install font-firacode-nerd-font
 ![图3](images/step3.png)
 
 可以看到红线标注处的特殊字符都可以显示正常
-
