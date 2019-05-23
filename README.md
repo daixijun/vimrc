@@ -6,15 +6,16 @@
 - Neovim
 - HomeBrew
 - iTerm2
+- NodeJS && yarn
 
 ## 安装
 
 ### 1. 下载配置
 
 ```bash
-mkdir -p ${HOME}/.config/nvim/
+mkdir -p ${HOME}/.config/
 git clone https://github.com/daixijun/vimrc.git
-ln -sf `pwd`/vimrc/init.vim ${HOME}/.config/nvim/init.vim
+ln -sf `pwd`/vimrc ${HOME}/.config/nvim
 ```
 
 ### 2. 安装Plugin
