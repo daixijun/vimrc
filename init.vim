@@ -1,18 +1,16 @@
 autocmd! bufwritepost $MYVIMRC source %   " 更改配置文件后 自动加载
-set nocompatible             " 禁用vi模式
 set clipboard+=unnamed        " 启用共享粘贴板
 set mouse-=a                 " 禁用鼠标
 set backspace=indent,eol,start  " 退格键
 " 字符编码
-let &termencoding=&encoding
-set encoding=utf-8
-set fileencoding=utf-8
-set fileencodings=utf-8,cp936,gb18030,gbk,gb2312
-set autoread                 " 外部修改后自动加载文件
+" let &termencoding=&encoding
+" set encoding=utf-8
+" set fileencoding=utf-8
+" set fileencodings=utf-8,cp936,gb18030,gbk,gb2312
 set vb t_vb=                 " 关闭提示音
 set autochdir                " 设定文件浏览器目录为当前目录
+set autoread                 " 配置更新后自动重载
 set cmdheight=2              " 命令行的高度，默认为1，这里设为2
-set history=700              " 保存700条记录
 set undolevels=700           " 可回退700步
 set number                   " 显示行号
 set relativenumber           " 显示相对行号
@@ -21,35 +19,29 @@ set nowrap                   " 不自动换行
 set fo-=t                    " don't automatically wrap text when typing
 set colorcolumn=160          " 160字符处显示标识线
 highlight ColorColumn ctermbg=233   " 高亮标识线
-set showcmd                  " 显示输入的命令
 set cursorline               " 高亮当前行
 set ruler                    " 显示当前位置
-set laststatus=2             " 状态栏显示为两行
 set tabstop=4                " TAB长度
 set softtabstop=4            " 如果 tabstop=4  那么按一次tab 插入4个空格， 按两次tab将会变成制表符， 逢8空格进1制表符
 set shiftwidth=4             " 自动缩进宽度
 set shiftround
 set expandtab                " 转换tab为空格
-set hlsearch                 " 高亮搜索结果
-set incsearch                " 自动跳到匹配结果
 set ignorecase               " 搜索时忽略大小写
 set smartcase                " 如果搜索模式包含大写字符，不使用 'ignorecase' 选项。只有在输入搜索模式并且打开 'ignorecase' 选项时才会使用。
 set nobackup                 " 不自动备份
 set nowritebackup
 set noswapfile               " 不生成.swap文件
-set autoindent               " 自动缩进
 set cindent                  " C 缩进
 set smartindent              " 智能缩进
 set showmatch                " 高亮显示匹配的括号
 set list                     " 显示不可视字符
-set listchars=tab:▸\ ,eol:¬  " 设置不可视字符格式
+set listchars="tab:▸\ ,eol:¬,trail:-,nbsp:+"  " 设置不可视字符格式
 set nofoldenable               " 自动折叠
-"set foldmethod=indent        " 设置折叠方式为缩进
-"set scrolloff=9999           " 让光标所在行处理屏幕中间，上下各保持 9999 行空隙
+"set foldmethod=indent " 设置折叠方式为缩进
+"set scrolloff=9999    " 让光标所在行处理屏幕中间，上下各保持 9999 行空隙
 
 let mapleader = ","
 let g:mapleader = ","
-" let $PATH = "~/.pyenv/shims:".$PATH
 
 " Quicksave command
 noremap <C-Z> :update<CR>
@@ -103,9 +95,9 @@ autocmd FileType yaml set ts=2 sw=2 sts=2 et
 " Enable syntax highlighting
 " You need to reload this file for the change to apply
 " 按文件类型加载插件及设置缩进
-filetype plugin indent on
-" 开启语法高亮
-syntax enable
+" filetype plugin indent on
+" " 开启语法高亮
+" syntax enable
 
 " 每行超过160个的字符用下划线标示
 au BufRead,BufNewFile *.s,*.c,*.cpp,*.h,*.cl,*.rb,*.sql,*.sh,*.vim,*.js,*.css,*.html,*.py 2match Underlined /.\%161v/
@@ -116,11 +108,21 @@ au BufRead,BufNewFile *.s,*.c,*.cpp,*.h,*.cl,*.rb,*.sql,*.sh,*.vim,*.js,*.css,*.
 " autocmd BufNewFile,BufReadPost *.sh,*.zsh,*.bash set filetype=sh
 
 " Setup vim-plug to manage your plugins
-" curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-"    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+    silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+      \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 
 " Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
 call plug#begin('~/.local/share/nvim/plugged')
+
+" 对齐
+Plug 'junegunn/vim-easy-align'
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
 
 " 语法高亮插件
 Plug 'sheerun/vim-polyglot'
@@ -151,8 +153,6 @@ else
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
-let g:python_host_prog = "/usr/local/bin/python"
-let g:python3_host_prog = "/usr/local/bin/python3"
 set runtimepath += "~/.local/share/nvim/plugged/deoplete.nvim/"
 " Use deoplete.
 let g:deoplete#enable_at_startup = 1
@@ -171,6 +171,9 @@ let g:deoplete#omni_patterns.terraform = '[^ *\t"{=$]\w*'
 " call deoplete#initialize()
 
 Plug 'zchee/deoplete-jedi', { 'for': 'python'}
+
+" 依赖Nodejs && yarn
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': './install.sh'}
 
 Plug 'w0rp/ale'
 " let &runtimepath .= ",~/.local/share/nvim/plugged/ale"
@@ -259,6 +262,10 @@ Plug 'saltstack/salt-vim'
 Plug 'sgur/vim-editorconfig'
 
 Plug 'tpope/vim-surround'
+Plug 'justinmk/vim-sneak'
+let g:sneak#label = 1
+
+Plug 'easymotion/vim-easymotion'
 
 Plug 'tpope/vim-markdown', {'for': 'markdown'}
 autocmd BufNewFile,BufReadPost *.md,*.markdown set filetype=markdown
@@ -372,6 +379,9 @@ set wildignore+=*/coverage/*
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.png,*.jpg,*.jpeg,*.gif
 let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 
+" PlugInstall and PlugUpdate will clone fzf in ~/.fzf and run the install script
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+
 " Git
 Plug 'tpope/vim-fugitive'
 set statusline+=%{fugitive#statusline()} "
@@ -430,7 +440,7 @@ Plug 'BtPht/python_editing'
 " Golang
 " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'nsf/gocode', { 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' }
+" Plug 'nsf/gocode', { 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' }
 
 " Terraform
 Plug 'hashivim/vim-terraform'
@@ -447,7 +457,7 @@ Plug 'juliosueiras/vim-terraform-completion'
 "let g:terraform_registry_module_completion = 0
 
 " 异步编译
-Plug 'neomake/neomake'
+Plug 'neomake/neomake', has('nvim') ? {} : { 'on': [] }
 
 call plug#end()
 
@@ -459,7 +469,6 @@ endif
 " colorscheme gruvbox
 colorscheme onedark
 " colorscheme OceanicNext
-set background=dark  " 设置背景颜色，也可设置为light
 " (Optional)Remove Info(Preview) window
 set completeopt-=preview
 " (Optional)Hide Info(Preview) window after completions
