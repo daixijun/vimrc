@@ -35,7 +35,7 @@ set cindent                  " C 缩进
 set smartindent              " 智能缩进
 set showmatch                " 高亮显示匹配的括号
 set list                     " 显示不可视字符
-set listchars="tab:▸\ ,eol:¬,trail:-,nbsp:+"  " 设置不可视字符格式
+set listchars=tab:▸\ ,eol:¬,trail:-,nbsp:+  " 设置不可视字符格式
 set nofoldenable               " 自动折叠
 "set foldmethod=indent " 设置折叠方式为缩进
 "set scrolloff=9999    " 让光标所在行处理屏幕中间，上下各保持 9999 行空隙
@@ -124,6 +124,9 @@ xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 
+" 翻页时平滑滚动
+" Plug 'yuttie/comfortable-motion.vim'
+
 " 语法高亮插件
 Plug 'sheerun/vim-polyglot'
 " 主题
@@ -173,7 +176,7 @@ let g:deoplete#omni_patterns.terraform = '[^ *\t"{=$]\w*'
 Plug 'zchee/deoplete-jedi', { 'for': 'python'}
 
 " 依赖Nodejs && yarn
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': './install.sh'}
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 
 Plug 'w0rp/ale'
 " let &runtimepath .= ",~/.local/share/nvim/plugged/ale"
@@ -269,6 +272,7 @@ Plug 'easymotion/vim-easymotion'
 
 Plug 'tpope/vim-markdown', {'for': 'markdown'}
 autocmd BufNewFile,BufReadPost *.md,*.markdown set filetype=markdown
+let g:markdown_syntax_conceal = 1
 
 " VUE && JS && TS
 Plug 'posva/vim-vue', {'for': 'vue'}
@@ -276,6 +280,7 @@ autocmd BufNewFile,BufReadPost *.vue set filetype=vue
 Plug 'othree/es.next.syntax.vim'
 Plug 'othree/yajs'
 
+Plug 'cespare/vim-toml'
 Plug 'elzr/vim-json', {'for': 'json'}
 let g:vim_json_syntax_conceal = 0
 " let g:vim_json_syntax_concealcursor = 'nvc'
@@ -301,7 +306,7 @@ let g:ultisnips_python_quoting_style = 'single'
 let g:UltiSnipsEditSplit="vertical"
 let g:UltiSnipsUsePythonVersion = 3
 
-Plug 'Glench/Vim-Jinja2-Syntax'
+" Plug 'Glench/Vim-Jinja2-Syntax'
 
 
 " 标红每行尾无效空格
@@ -332,8 +337,8 @@ Plug 'Raimondi/delimitMate'
 au FileType python let b:delimitMate_nesting_quotes = ['"']
 
 " 自动补全html/xml标签
-Plug 'docunext/closetag.vim'
-let g:closetag_html_style = 1
+" Plug 'docunext/closetag.vim'
+" let g:closetag_html_style = 1
 
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 nmap <silent> <F3> :NERDTreeToggle <CR><ESC>
@@ -350,7 +355,7 @@ autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
 
 " 文件操作
-Plug 'tpope/vim-eunuch'
+" Plug 'tpope/vim-eunuch'
     " :Remove: Delete a buffer and the file on disk simultaneously.
     " :Unlink: Like :Remove, but keeps the now empty buffer.
     " :Move: Rename a buffer and the file on disk simultaneously.
@@ -366,9 +371,12 @@ Plug 'tpope/vim-eunuch'
     " New files created with a shebang line are automatically made executable.
     " New init scripts are automatically prepopulated with /etc/init.d/skeleton.
 
-Plug 'sjl/gundo.vim'
-let g:gundo_preview_height = 40
-let g:gundo_width = 24
+" Plug 'sjl/gundo.vim'
+" let g:gundo_preview_height = 40
+" let g:gundo_width = 24
+
+" Dockerfile
+Plug 'ekalinin/Dockerfile.vim'
 
 " 文件查找
 Plug 'kien/ctrlp.vim'
@@ -391,6 +399,16 @@ Plug 'airblade/vim-gitgutter'
 let g:gitgutter_map_keys = 0
 let g:gitgutter_enabled = 1
 let g:gitgutter_highlight_lines = 0
+
+" Git 信息查看
+Plug 'rhysd/git-messenger.vim'
+" Mapping	Description
+" q	Close the popup window
+" o	older. Back to older commit at the line
+" O	Opposite to o. Forward to newer commit at the line
+" d	Toggle diff hunks only related to current file in the commit
+" D	Toggle all diff hunks in the commit
+" ?	Show mappings help
 
 " 注释
 Plug 'scrooloose/nerdcommenter'
@@ -441,6 +459,8 @@ Plug 'BtPht/python_editing'
 " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 " Plug 'nsf/gocode', { 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' }
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
 
 " Terraform
 Plug 'hashivim/vim-terraform'
@@ -470,7 +490,7 @@ endif
 colorscheme onedark
 " colorscheme OceanicNext
 " (Optional)Remove Info(Preview) window
-set completeopt-=preview
+" set completeopt-=preview
 " (Optional)Hide Info(Preview) window after completions
 autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
 autocmd InsertLeave * if pumvisible() == 0|pclose|endif
