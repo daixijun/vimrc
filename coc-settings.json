@@ -1,77 +1,122 @@
 {
+  "suggest.autoTrigger": "always",
+  "suggest.keepCompleteopt": false,
+  "suggest.triggerAfterInsertEnter": true,
+  "suggest.timeout": 500,
+  "suggest.noselect": false,
+  "suggest.minTriggerInputLength": 1,
+  "suggest.acceptSuggestionOnCommitCharacter": true,
+  "diagnostic.messageTarget": "float",
+  "diagnostic.refreshOnInsertMode": true,
+  "diagnostic.signOffset": 9999999,
+  "diagnostic.virtualText": false,
+  "diagnostic.virtualTextLines": 3,
+  "signature.target": "float",
+  "coc.preferences.hoverTarget": "float",
+  "codeLens.enable": true,
+  "coc.preferences.formatOnSaveFiletypes":[
+    "python",
+    "go"
+  ],
   "python.jediEnabled": false,
+  "python.pipenvPath": "/usr/local/bin/pipenv",
+  "python.pythonPath": "/usr/local/bin/python3",
+  "python.venvPath": "~/.virtualenvs",
+  "python.linting.enabled": false,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length 160"
+  ],
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": [
+    "--line-length 160"
+  ],
+  "json.enable": true,
+  "json.format.enable": true,
   "languageserver": {
     "golang": {
       "command": "gopls",
-      "rootPatterns": ["go.mod", ".vim/", ".git/", ".hg/"],
-      "filetypes": ["go"]
+      // "args": ["serve"],
+      // "trace.server": "verbose",
+      "enable": true,
+      "rootPatterns": [
+        "go.mod",
+        ".vim/",
+        ".git/",
+        ".hg/"
+      ],
+      "filetypes": [
+        "go"
+      ]
     },
     "python": {
-        "command": "python3",
-        "args": [
+      "command": "python3",
+      "args": [
         "-mpyls",
         "-vv",
         "--log-file",
         "/tmp/lsp_python.log"
-        ],
-        "trace.server": "verbose",
-        "filetypes": [
-        "python"
-        ],
-        "settings": {
+      ],
+      "trace.server": "verbose",
+      "filetypes": [
+        "python",
+        "python.jinja2"
+      ],
+      "settings": {
         "pyls": {
-            "enable": true,
-            "trace": {
+          "enable": true,
+          "trace": {
             "server": "verbose"
-            },
-            "commandPath": "",
-            "configurationSources": [
+          },
+          "commandPath": "",
+          "configurationSources": [
             "pycodestyle"
-            ],
-            "plugins": {
+          ],
+          "plugins": {
             "jedi_completion": {
-                "enabled": true
+              "enabled": true
             },
             "jedi_hover": {
-                "enabled": true
+              "enabled": true
             },
             "jedi_references": {
-                "enabled": true
+              "enabled": true
             },
             "jedi_signature_help": {
-                "enabled": true
+              "enabled": true
             },
             "jedi_symbols": {
-                "enabled": true,
-                "all_scopes": true
+              "enabled": true,
+              "all_scopes": true
             },
             "mccabe": {
-                "enabled": true,
-                "threshold": 15
+              "enabled": true,
+              "threshold": 15
             },
             "preload": {
-                "enabled": true
+              "enabled": true
             },
             "pycodestyle": {
-                "enabled": true
+              "enabled": true
             },
             "pydocstyle": {
-                "enabled": false,
-                "match": "(?!test_).*\\.py",
-                "matchDir": "[^\\.].*"
+              "enabled": false,
+              "match": "(?!test_).*\\.py",
+              "matchDir": "[^\\.].*"
             },
             "pyflakes": {
-                "enabled": true
+              "enabled": false
             },
             "rope_completion": {
-                "enabled": true
+              "enabled": false
             },
             "yapf": {
-                "enabled": true
+              "enabled": false
             }
-            }
+          }
         }
-        }
+      }
     }
   }
 }

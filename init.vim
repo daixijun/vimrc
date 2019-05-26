@@ -13,7 +13,7 @@ set autoread                 " 配置更新后自动重载
 set cmdheight=2              " 命令行的高度，默认为1，这里设为2
 set undolevels=700           " 可回退700步
 set number                   " 显示行号
-set relativenumber           " 显示相对行号
+" set relativenumber           " 显示相对行号
 set tw=159                   " 每行字符长度
 set nowrap                   " 不自动换行
 set fo-=t                    " don't automatically wrap text when typing
@@ -35,13 +35,123 @@ set cindent                  " C 缩进
 set smartindent              " 智能缩进
 set showmatch                " 高亮显示匹配的括号
 set list                     " 显示不可视字符
-set listchars=tab:▸\ ,eol:¬,trail:-,nbsp:+  " 设置不可视字符格式
+set listchars=tab:▸\ ,eol:¬,trail:˽,space:· " 设置不可视字符格式
 set nofoldenable               " 自动折叠
+set conceallevel=0
+set foldmethod=syntax
+set laststatus=2
+" set spell spelllang=en_us    " 打开英语单词的拼写检查
 "set foldmethod=indent " 设置折叠方式为缩进
 "set scrolloff=9999    " 让光标所在行处理屏幕中间，上下各保持 9999 行空隙
 
+" coc settings
+" if hidden is not set, TextEdit might fail.
+set hidden
+" Smaller updatetime for CursorHold & CursorHoldI
+set updatetime=100
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+" always show signcolumns
+set signcolumn=yes
+
 let mapleader = ","
 let g:mapleader = ","
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+" Use <c-space> to trigger completion.
+" inoremap <silent><expr> <c-p> coc#refresh()
+
+" Use `[c` and `]c` to navigate diagnostics
+" nmap <silent> [c <Plug>(coc-diagnostic-prev)
+" nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+vmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+" Show all diagnostics
+" nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" " Manage extensions
+" nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" " Show commands
+" nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" " Find symbol of current document
+" nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" " Search workspace symbols
+" nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" " Do default action for next item.
+" nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" " Do default action for previous item.
+" nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" " Resume latest coc list
+" nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+"
+"
+" COC Snippets
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+" Use <C-l> for trigger snippet expand.
+imap <C-l> <Plug>(coc-snippets-expand)
+" Use <C-j> for select text for visual placeholder of snippet.
+vmap <C-j> <Plug>(coc-snippets-select)
+" Use <C-j> for jump to next placeholder, it's default of coc.nvim
+let g:coc_snippet_next = '<c-j>'
+" Use <C-k> for jump to previous placeholder, it's default of coc.nvim
+let g:coc_snippet_prev = '<c-k>'
+" Use <C-j> for both expand and jump (make expand higher priority.)
+imap <C-j> <Plug>(coc-snippets-expand-jump)
+let g:coc_snippet_next = '<tab>'
+
 
 " Quicksave command
 noremap <C-Z> :update<CR>
@@ -85,12 +195,13 @@ inoremap <C-k>  <C-p>
 
 " 记录退出时光标位置，下次打开时光标自动定位到此处
 if has("autocmd")
-    au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
+    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+    " autocmd BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 endif
 
 " YAML 配置
-au! BufRead,BufNewFile *.yml,*.yaml set filetype=yaml
-autocmd FileType yaml set ts=2 sw=2 sts=2 et
+" au! BufRead,BufNewFile *.yml,*.yaml set filetype=yaml
+" autocmd FileType yaml set ts=2 sw=2 sts=2 et
 
 " Enable syntax highlighting
 " You need to reload this file for the change to apply
@@ -100,7 +211,7 @@ autocmd FileType yaml set ts=2 sw=2 sts=2 et
 " syntax enable
 
 " 每行超过160个的字符用下划线标示
-au BufRead,BufNewFile *.s,*.c,*.cpp,*.h,*.cl,*.rb,*.sql,*.sh,*.vim,*.js,*.css,*.html,*.py 2match Underlined /.\%161v/
+" au BufRead,BufNewFile *.s,*.c,*.cpp,*.h,*.cl,*.rb,*.sql,*.sh,*.vim,*.js,*.css,*.html,*.py 2match Underlined /.\%161v/
 
 " 设置文件折叠方式
 " autocmd BufNewFile,BufReadPost *.py,*.pyw set foldmethod=indent
@@ -117,104 +228,39 @@ endif
 " Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
 call plug#begin('~/.local/share/nvim/plugged')
 
-" 对齐
-Plug 'junegunn/vim-easy-align'
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
+" VIM 中文help
+Plug 'yianwillis/vimcdoc'
 
-" 翻页时平滑滚动
-" Plug 'yuttie/comfortable-motion.vim'
+" 括号自动补全
+Plug 'jiangmiao/auto-pairs'
 
 " 语法高亮插件
 Plug 'sheerun/vim-polyglot'
 " 主题
 Plug 'joshdick/onedark.vim'
-" Plug 'morhetz/gruvbox'
+let g:onedark_terminal_italics = 1
+" let g:onedark_termcolors = 256
+let g:onedark_hide_endofbuffer = 1
 
-" 状态栏
+" Ansible
+Plug 'pearofducks/ansible-vim'
+let g:ansible_template_syntaxes = { '*.rb.j2': 'ruby', '*.py.j2': 'python', '*.service.j2': 'systemd' }
+
+" SaltStack
+Plug 'saltstack/salt-vim'
+let g:sls_use_jinja_syntax = 1
+
 Plug 'bling/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-" let g:airline_theme = 'oceanicnext'
-" let g:airline_theme = 'gruvbox'
 let g:airline_theme = 'onedark'
 let g:airline#extensions#tabline#enabled = 1
-" let g:airline#extensions#syntastic#enabled = 1
-let g:airline#extensions#ale#enabled = 1
-let g:airline#extensions#ale#error_symbol = 'E:'
-let g:airline#extensions#ale#warning_symbol = 'W:'
 let g:airline_powerline_fonts = 1        " 启用powerline样式字体
 " let g:airline_section_b = '%{strftime("%Y-%m-%d %H:%M:%S")}'
-let g:airline_section_error = '%{exists("ALEGetStatusLine") ? ALEGetStatusLine() : ""}'
-
-" 代替YCM 自动补全
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-endif
-set runtimepath += "~/.local/share/nvim/plugged/deoplete.nvim/"
-" Use deoplete.
-let g:deoplete#enable_at_startup = 1
-" Terraform
-let g:deoplete#omni_patterns = {}
-let g:deoplete#omni_patterns.terraform = '[^ *\t"{=$]\w*'
-" let g:deoplete#omni_patterns.complete_method = 'complete'
-" call deoplete#custom#option({
-" \  'auto_complete': v:true,
-" \  'omni_patterns': {
-" \    'complete_method': 'omnifunc',
-" \    'terraform': '[^ *\t"{=$]\w*',
-" \  },
-" \  'complete_method': 'complete',
-" \})
-" call deoplete#initialize()
-
-Plug 'zchee/deoplete-jedi', { 'for': 'python'}
 
 " 依赖Nodejs && yarn
-Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
-
-Plug 'w0rp/ale'
-" let &runtimepath .= ",~/.local/share/nvim/plugged/ale"
-let g:ale_enabled = 1
-" let g:ale_sign_column_always = 1
-" let g:ale_statusline_format = ['⨉ %d', '⚠ %d', '⬥ ok']
-" let g:ale_echo_msg_error_str = 'E'
-" let g:ale_echo_msg_warning_str = 'W'
-let g:ale_sign_error = '>>'
-let g:ale_sign_warning = '--'
-let g:ale_echo_msg_error_str = 'E'
-let g:ale_echo_msg_warning_str = 'W'
-let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-let g:ale_lint_on_save = 1
-" let g:ale_set_loclist = 0
-" let g:ale_set_quickfix = 1
-let g:ale_lint_on_text_changed = 'normal'
-let g:ale_history_log_output = 1
-let g:ale_lint_on_insert_leave = 0
-let g:ale_linters = {
-\   "python": ["flake8"],
-\   'javascript': ['eslint'],
-\   'yaml.ansible': ['ansible-lint'],
-\}
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'javascript': ['eslint'],
-\}
-" Set this variable to 1 to fix files when you save them.
-let g:ale_fix_on_save = 1
-" let g:ale_python_flake8_executable = '/usr/local/bin/flake8'
-let g:ale_python_flake8_args = '--max-line-length=160'
-let g:ale_open_list = 1
-" Set this if you want to.
-" This can be useful if you are combining ALE with
-" some other plugin which sets quickfix errors, etc.
-" let g:ale_keep_list_window_open = 1
-" set statusline+=%{ALEGetStatusLine()}
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install() } }
+" JSON 注释高亮
+" autocmd FileType json syntax match Comment +\/\/.\+$+
 
 Plug 'ryanoasis/vim-devicons'
 " loading the plugin
@@ -230,39 +276,35 @@ let g:webdevicons_enable_flagship_statusline = 1
 " Force extra padding in NERDTree so that the filetype icons line up vertically
 let g:WebDevIconsNerdTreeGitPluginForceVAlign = 1
 
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown', {'for': 'markdown'}
+let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_toc_autofit = 0
+let g:vim_markdown_conceal = 0
+let g:vim_markdown_frontmatter = 1
+let g:vim_markdown_toml_frontmatter = 1
+let g:vim_markdown_json_frontmatter = 1
+let g:vim_markdown_new_list_item_indent = 2
+let g:vim_markdown_autowrite = 1
+
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install', 'for': 'markdown'  }
+
+
 Plug 'Yggdroot/indentLine'
 let g:indentLine_setColors = 0
 let g:indentLine_color_term = 239
+let g:indentLine_bgcolor_term = 202
 let g:indentLine_enabled = 1
 " let g:indentLine_char = 'c'
 let g:indentLine_concealcursor = 'inc'
+" let g:indentLine_char = 'c'
+" let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 let g:indentLine_conceallevel = 2
 let g:indentLine_color_dark = 1
 
-Plug 'hdima/python-syntax'
-let python_highlight_all = 1
-
-" Ansible
-Plug 'willthames/ansible-lint', { 'for': 'ansible' }
-Plug 'pearofducks/ansible-vim', { 'do': 'cd ./UltiSnips; ./generate.py' }
-let g:ansible_unindent_after_newline = 1
-let g:ansible_attribute_highlight = "od"
-    " a: highlight all instances of key=
-    " o: highlight only instances of key= found on newlines
-    " d: dim the instances of key= found
-    " b: brighten the instances of key= found
-    " n: turn this highlight off completely
-let g:ansible_name_highlight = 'd'
-    " d: dim the instances of name: found
-    " b: brighten the instances of name: found
-let g:ansible_extra_keywords_highlight = 1
-let g:ansible_normal_keywords_highlight = 'Constant'
-let g:ansible_with_keywords_highlight = 'Constant'
-
-" Saltstack
-Plug 'saltstack/salt-vim'
-
-Plug 'sgur/vim-editorconfig'
+" Plug 'sgur/vim-editorconfig'
+Plug 'editorconfig/editorconfig-vim'
+let g:EditorConfig_exclude_patterns = ['fugitive://.\*', 'scp://.\*']
 
 Plug 'tpope/vim-surround'
 Plug 'justinmk/vim-sneak'
@@ -270,20 +312,13 @@ let g:sneak#label = 1
 
 Plug 'easymotion/vim-easymotion'
 
-Plug 'tpope/vim-markdown', {'for': 'markdown'}
-autocmd BufNewFile,BufReadPost *.md,*.markdown set filetype=markdown
-let g:markdown_syntax_conceal = 1
-
-" VUE && JS && TS
-Plug 'posva/vim-vue', {'for': 'vue'}
-autocmd BufNewFile,BufReadPost *.vue set filetype=vue
-Plug 'othree/es.next.syntax.vim'
-Plug 'othree/yajs'
 
 Plug 'cespare/vim-toml'
 Plug 'elzr/vim-json', {'for': 'json'}
+" 是否隐藏引号号，通过颜色区分变量类型
 let g:vim_json_syntax_conceal = 0
 " let g:vim_json_syntax_concealcursor = 'nvc'
+let g:vim_json_warnings=1
 
 " 括号高亮
 " Plug 'kien/rainbow_parentheses.vim'
@@ -296,18 +331,6 @@ let g:multi_cursor_next_key='<C-N>'
 let g:multi_cursor_prev_key='<C-P>'
 let g:multi_cursor_skip_key='<C-X>'
 let g:multi_cursor_quit_key='<Esc>'
-
-
-Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-let g:ultisnips_python_quoting_style = 'single'
-let g:UltiSnipsEditSplit="vertical"
-let g:UltiSnipsUsePythonVersion = 3
-
-" Plug 'Glench/Vim-Jinja2-Syntax'
-
 
 " 标红每行尾无效空格
 Plug 'bronson/vim-trailing-whitespace'
@@ -328,71 +351,120 @@ let g:tagbar_type_python = {
         \ 'i:imports:1'
     \ ]
 \ }
+let g:tagbar_type_go = {
+    \ 'ctagstype' : 'go',
+    \ 'kinds'     : [
+        \ 'p:package',
+        \ 'i:imports:1',
+        \ 'c:constants',
+        \ 'v:variables',
+        \ 't:types',
+        \ 'n:interfaces',
+        \ 'w:fields',
+        \ 'e:embedded',
+        \ 'm:methods',
+        \ 'r:constructor',
+        \ 'f:functions'
+    \ ],
+    \ 'sro' : '.',
+    \ 'kind2scope' : {
+        \ 't' : 'ctype',
+        \ 'n' : 'ntype'
+    \ },
+    \ 'scope2kind' : {
+        \ 'ctype' : 't',
+        \ 'ntype' : 'n'
+    \ },
+    \ 'ctagsbin'  : 'gotags',
+    \ 'ctagsargs' : '-sort -silent'
+    \ }
 
 " 自定义VIM启动界面
 Plug 'mhinz/vim-startify'
 
 " 自动补全引号括号等
-Plug 'Raimondi/delimitMate'
-au FileType python let b:delimitMate_nesting_quotes = ['"']
+" Plug 'Raimondi/delimitMate'
+" au FileType python let b:delimitMate_nesting_quotes = ['"']
 
 " 自动补全html/xml标签
 " Plug 'docunext/closetag.vim'
 " let g:closetag_html_style = 1
 
+" 侧边栏，代替Nerdtree
+" Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
+" " call defx#custom#column('size','')
+" " call defx#custom#column('filename', {
+" "       \ 'directory_icon': '▸',
+" "       \ 'opened_icon': '▾',
+" "       \ 'root_icon': ' ',
+" "       \ 'min_width': 30,
+" "       \ 'max_width': 30,
+" "       \ })
+" " call defx#custom#column('mark', {
+" "       \ 'readonly_icon': '',
+" "       \ 'selected_icon': '',
+" "       \ })
+" Plug 'kristijanhusak/defx-git'
+" let g:defx_git#indicators = {
+"   \ 'Modified'  : '✹',
+"   \ 'Staged'    : '✚',
+"   \ 'Untracked' : '✭',
+"   \ 'Renamed'   : '➜',
+"   \ 'Unmerged'  : '═',
+"   \ 'Ignored'   : '☒',
+"   \ 'Deleted'   : '✖',
+"   \ 'Unknown'   : '?',
+"   \ }
+" let g:defx_git#column_length = 1
+" let g:defx_git#show_ignored = 0
+" let g:defx_git#raw_mode = 1
+"
+" Plug 'kristijanhusak/defx-icons'
+" let g:defx_icons_enable_syntax_highlight = 1
+" let g:defx_icons_column_length = 2
+" let g:defx_icons_directory_icon = ''
+" let g:defx_icons_mark_icon = '*'
+" let g:defx_icons_parent_icon = ''
+" let g:defx_icons_default_icon = ''
+" let g:defx_icons_directory_symlink_icon = ''
+" " Options below are applicable only when using "tree" feature
+" let g:defx_icons_root_opened_tree_icon = ''
+" let g:defx_icons_nested_opened_tree_icon = ''
+" let g:defx_icons_nested_closed_tree_icon = ''
+" " autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'defx') | quit | endif
+
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 nmap <silent> <F3> :NERDTreeToggle <CR><ESC>
-let NERDTreeWinSize=24
+let NERDTreeWinSize=30
 let NERDTreeIgnore=['\.pyc$', '\.pyo$', '\.swp$', '\~$', '.git$[[dir]]', '.svn$[[dir]]']
 let NERDTreeShowHidden=1
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
 " 当只有NerdTree窗口时,自动关闭
-" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 " 打开目录时自动开启NerdTree
 autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
-
-" 文件操作
-" Plug 'tpope/vim-eunuch'
-    " :Remove: Delete a buffer and the file on disk simultaneously.
-    " :Unlink: Like :Remove, but keeps the now empty buffer.
-    " :Move: Rename a buffer and the file on disk simultaneously.
-    " :Rename: Like :Move, but relative to the current file's containing directory.
-    " :Chmod: Change the permissions of the current file.
-    " :Mkdir: Create a directory, defaulting to the parent of the current file.
-    " :Find: Run find and load the results into the quickfix list.
-    " :Locate: Run locate and load the results into the quickfix list.
-    " :Wall: Write every open window. Handy for kicking off tools like guard.
-    " :SudoWrite: Write a privileged file with sudo.
-    " :SudoEdit: Edit a privileged file with sudo.
-    " File type detection for sudo -e is based on original file name.
-    " New files created with a shebang line are automatically made executable.
-    " New init scripts are automatically prepopulated with /etc/init.d/skeleton.
-
-" Plug 'sjl/gundo.vim'
-" let g:gundo_preview_height = 40
-" let g:gundo_width = 24
+autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+" autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
 
 " Dockerfile
 Plug 'ekalinin/Dockerfile.vim'
 
 " 文件查找
-Plug 'kien/ctrlp.vim'
-let g:ctrlp_max_height = 30
-set wildignore+=*.pyc
-set wildignore+=*_build/*
-set wildignore+=*/coverage/*
-set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.png,*.jpg,*.jpeg,*.gif
-let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+" Plug 'kien/ctrlp.vim'
+" let g:ctrlp_max_height = 30
+" set wildignore+=*.pyc
+" set wildignore+=*_build/*
+" set wildignore+=*/coverage/*
+" set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.png,*.jpg,*.jpeg,*.gif
+" let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
 
 " PlugInstall and PlugUpdate will clone fzf in ~/.fzf and run the install script
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+" Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 
 " Git
 Plug 'tpope/vim-fugitive'
-set statusline+=%{fugitive#statusline()} "
+" set statusline+=%{fugitive#statusline()}
 
 " Git 实时展示修改
 Plug 'airblade/vim-gitgutter'
@@ -402,6 +474,7 @@ let g:gitgutter_highlight_lines = 0
 
 " Git 信息查看
 Plug 'rhysd/git-messenger.vim'
+nmap <Leader>gm <Plug>(git-messenger)
 " Mapping	Description
 " q	Close the popup window
 " o	older. Back to older commit at the line
@@ -419,7 +492,7 @@ let g:NERDCompactSexyComs = 1
 " Align line-wise comment delimiters flush left instead of following code indentation
 let g:NERDDefaultAlign = 'left'
 " Set a language to use its alternate delimiters by default
-let g:NERDAltDelims_java = 1
+" let g:NERDAltDelims_java = 1
 " Add your own custom formats or override the defaults
 let g:NERDCustomDelimiters = {
     \ 'c': {'left': '"'},
@@ -444,31 +517,26 @@ let g:NERDTrimTrailingWhitespace = 1
 " 12、<Leader>cu 取消注释
 
 
-" Python 折叠
-Plug 'BtPht/python_editing'
-" 使用:
-" f: 折叠/取消 当前class/function
-" F: 折叠/取消 所有
-
-" Python virtualenv
-" Plug 'jmcantrell/vim-virtualenv'
-
-" Plug 'bling/vim-bufferline'
-
 " Golang
 " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': 'go' }
 " Plug 'nsf/gocode', { 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' }
 let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
+" disable vim-go :GoDef short cut (gd)
+" this is handled by LanguageClient [LC]
+let g:go_def_mapping_enabled = 0
+let g:go_fmt_command = "goimports"
+let g:go_fmt_autosave = 0
 
 " Terraform
-Plug 'hashivim/vim-terraform'
+Plug 'hashivim/vim-terraform', { 'for': 'terraform' }
 let g:terraform_align=1
 let g:terraform_fold_sections=1
+let g:terraform_fmt_on_save=1
 
 " Terraform 自动补全
-Plug 'juliosueiras/vim-terraform-completion'
+Plug 'juliosueiras/vim-terraform-completion', { 'for': 'terraform' }
 " (Optional) Enable terraform plan to be include in filter
 " let g:syntastic_terraform_tffilter_plan = 1
 " (Optional) Default: 0, enable(1)/disable(0) plugin's keymapping
@@ -476,21 +544,22 @@ Plug 'juliosueiras/vim-terraform-completion'
 " (Optional) Default: 1, enable(1)/disable(0) terraform module registry completion
 "let g:terraform_registry_module_completion = 0
 
-" 异步编译
-Plug 'neomake/neomake', has('nvim') ? {} : { 'on': [] }
-
 call plug#end()
 
-syntax enable
-if has("termguicolors")
+"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
+"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
+"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
+if (has("nvim"))
+    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+endif
+"For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+"Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+" < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+if (has("termguicolors"))
     set termguicolors
 endif
-" 主题样式
-" colorscheme gruvbox
+" if !has('gui_running')
+"   set t_Co=256
+" endif
 colorscheme onedark
-" colorscheme OceanicNext
-" (Optional)Remove Info(Preview) window
-" set completeopt-=preview
-" (Optional)Hide Info(Preview) window after completions
-autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-autocmd InsertLeave * if pumvisible() == 0|pclose|endif
