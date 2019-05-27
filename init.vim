@@ -18,7 +18,7 @@ Plug 'ntpeters/vim-better-whitespace'  " 清除行尾无效空格
 Plug 'terryma/vim-multiple-cursors'     " 多光标操作
 Plug 'editorconfig/editorconfig-vim'     " 支持editorconfig
 Plug 'tpope/vim-surround'       " 快速替换tag或引号
-Plug 'justinmk/vim-sneak'
+" Plug 'justinmk/vim-sneak'       " 快速跳转工具
 Plug 'pearofducks/ansible-vim'  " ansible
 Plug 'saltstack/salt-vim'       " SaltStack
 Plug 'cespare/vim-toml'
@@ -37,8 +37,10 @@ Plug 'majutsushi/tagbar'
 Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }   " 代替nerdtree侧边栏
 Plug 'kristijanhusak/defx-git'
 Plug 'kristijanhusak/defx-icons'
-Plug 'Shougo/denite.nvim', { 'do': ':UpdateRemotePlugins' } 		" 快速搜索工具
-Plug 'Shougo/neomru.vim'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+" Plug 'Shougo/denite.nvim', { 'do': ':UpdateRemotePlugins' } 		" 快速搜索工具
+" Plug 'Shougo/neomru.vim'
 Plug 'ekalinin/Dockerfile.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'   " 左边实现显示git变动
@@ -318,7 +320,7 @@ let g:webdevicons_enable_airline_statusline = 1
 " adding to vim-startify screen
 let g:webdevicons_enable_startify = 1
 " Adding the custom source to denite
-let g:webdevicons_enable_denite = 1
+" let g:webdevicons_enable_denite = 1
 
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_toc_autofit = 0
@@ -342,8 +344,6 @@ let g:indentLine_color_dark = 1
 
 let g:EditorConfig_exclude_patterns = ['fugitive://.\*', 'scp://.\*']
 
-let g:sneak#label = 1
-
 " 是否隐藏引号号，通过颜色区分变量类型
 let g:vim_json_syntax_conceal = 0
 " let g:vim_json_syntax_concealcursor = 'nvc'
@@ -353,53 +353,9 @@ let g:vim_json_warnings=1
 " Plug 'kien/rainbow_parentheses.vim'
 " Plug 'evanmiller/nginx-vim-syntax'
 
-
-" Denite
-nnoremap [denite] <Nop>
-nmap <C-p> [denite]
-nnoremap <silent> [denite]b :Denite buffer<CR>
-nnoremap <silent> [denite]c :Denite changes<CR>
-nnoremap <silent> [denite]f :Denite file<CR>
-nnoremap <silent> [denite]g :Denite grep<CR>
-nnoremap <silent> [denite]h :Denite help<CR>
-nnoremap <silent> [denite]h :Denite help<CR>
-nnoremap <silent> [denite]l :Denite line<CR>
-nnoremap <silent> [denite]t :Denite tag<CR>
-nnoremap <silent> [denite]m :Denite file_mru<CR>
-nnoremap <silent> [denite]u :Denite menu<CR>
-call denite#custom#map('insert', '<C-j>', '<denite:move_to_next_line>', 'noremap')
-call denite#custom#map('insert', '<C-k>', '<denite:move_to_previous_line>', 'noremap')
-call denite#custom#map('insert', '<C-cr>', '<denite:choose_action>', 'noremap')
-call denite#custom#map('insert', 'jj', '<denite:enter_mode:normal>', 'noremap')
-
-" Add custom menus
-let s:menus = {}
-let s:menus.file = {'description': 'File search (buffer, file, file_rec, file_mru'}
-let s:menus.line = {'description': 'Line search (change, grep, line, tag'}
-let s:menus.others = {'description': 'Others (command, command_history, help)'}
-let s:menus.file.command_candidates = [
-    \ ['buffer', 'Denite buffer'],
-    \ ['file: Files in the current directory', 'Denite file'],
-    \ ['file_rec: Files, recursive list under the current directory', 'Denite file_rec'],
-    \ ['file_mru: Most recently used files', 'Denite file_mru']
-    \ ]
-let s:menus.line.command_candidates = [
-    \ ['change', 'Denite change'],
-    \ ['grep :grep', 'Denite grep'],
-    \ ['line', 'Denite line'],
-    \ ['tag', 'Denite tag']
-    \ ]
-let s:menus.others.command_candidates = [
-    \ ['command', 'Denite command'],
-    \ ['command_history', 'Denite command_history'],
-    \ ['help', 'Denite help']
-    \ ]
-
-call denite#custom#var('menu', 'menus', s:menus)
-call denite#custom#option('default', {
-    \ 'prompt': '➭',
-    \ 'split': 'horizontal',
-	\ })
+" FZF
+nnoremap <silent> <C-p> :Files<CR>
+nnoremap <silent> <C-g> :GFiles<CR>
 
 " 多重光标选取
 let g:multi_cursor_next_key='<C-N>'
@@ -531,7 +487,7 @@ function! DefxSettings() abort
   " nnoremap <silent><buffer><expr> N defx#do_action('new_file')
   nnoremap <silent><buffer><expr> M defx#do_action('new_multiple_files')
   " nnoremap <silent><buffer><expr> C defx#do_action('toggle_columns','git:mark:filename:type:size:time')
-  nnoremap <silent><buffer><expr> S defx#do_action('toggle_sort', 'time')
+  " nnoremap <silent><buffer><expr> S defx#do_action('toggle_sort', 'time')
   nnoremap <silent><buffer><expr> d defx#do_action('remove')
   nnoremap <silent><buffer><expr> r defx#do_action('rename')
   nnoremap <silent><buffer><expr> ! defx#do_action('execute_command')
