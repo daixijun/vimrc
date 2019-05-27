@@ -461,7 +461,6 @@ let g:tagbar_type_go = {
 " let g:closetag_html_style = 1
 
 " 侧边栏，代替Nerdtree
-" set rtp+=expand("~/.local/share/nvim/plugged/defx.nvim")
 call defx#custom#column('size','')
 call defx#custom#column('filename', {
       \ 'min_width': 40,
@@ -474,7 +473,7 @@ call defx#custom#column('mark', {
 call defx#custom#option('_',{
       \ 'columns'   : 'icons:indent:filename:type:size',
       \ 'split'     : 'floating',
-      \ 'direction' : 'botright',
+      \ 'direction' : 'topleft',
       \ 'winwidth'  : 45,
       \ 'show_ignored_files': 0,
       \ 'buffer_name': '',
@@ -482,7 +481,21 @@ call defx#custom#option('_',{
       \ 'resume': 1,
       \ })
 
-" autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'defx') | quit | endif
+
+" 打开目录时自动开启defx
+" TODO: 此处如果打开目录时使用 `floating` 窗口，将窗口无法取得焦点，所以指定`vertical`方式
+augroup ft_defx
+    au!
+    au VimEnter * sil! au! FileExplorer *
+    au BufEnter * if s:isdir(expand('%')) | bd | exe 'Defx -split=vertical' | endif
+augroup END
+
+fu! s:isdir(dir) abort
+    return !empty(a:dir) && (isdirectory(a:dir) ||
+       \ (!empty($SYSTEMDRIVE) && isdirectory('/'.tolower($SYSTEMDRIVE[0]).a:dir)))
+endfu
+" 只有defx窗口时自动关闭
+autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'defx') | quit | endif
 nnoremap <silent> <leader>d :Defx<Cr>
 autocmd FileType defx DisableWhitespace
 autocmd FileType defx call DefxSettings()
