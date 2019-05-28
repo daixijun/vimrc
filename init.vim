@@ -453,7 +453,7 @@ call defx#custom#option('_',{
     \ 'columns'   : 'indent:icons:filename:type:size',
     \ 'split'     : 'floating',
     \ 'direction' : 'topleft',
-    \ 'winwidth'  : 120,
+    \ 'winwidth'  : 45,
     \ 'show_ignored_files': 0,
     \ 'buffer_name': '[defx]',
     \ 'auto_cd': 0,
