@@ -273,30 +273,8 @@ if has("autocmd")
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
 
-" YAML 配置
-" augroup ft_yaml
-"     au! BufRead,BufNewFile *.yml,*.yaml set filetype=yaml
-"     autocmd FileType yaml set ts=2 sw=2 sts=2 et
-" augroup end
-"
-" augroup ft_json
-"     au! BufNewFile,BufReadPost *.json set filetype=json
-"     autocmd FileType json ts=2 sw=2 sts=2 et
-" augroup end
-"
-" augroup ft_python
-"     au! BufNewFile,BufReadPost *.py,*.pyw set filetype=python
-"     autocmd FileType python ts=4 sw=4 sts=4 et
-" augroup end
-
-
-" augroup ft_go
-"     au! BufNewFile,BufReadPost *.go set filetype=go
-"     autocmd FileType go ts=4 sw=4 sts=4 noet
-" augroup end
-
 let g:onedark_terminal_italics = 1
-" let g:onedark_termcolors = 256
+let g:onedark_termcolors = 256
 let g:onedark_hide_endofbuffer = 1
 
 " Ansible
@@ -312,7 +290,7 @@ let g:airline_powerline_fonts = 1        " 启用powerline样式字体
 " loading the plugin
 let g:webdevicons_enable = 1
 " adding the flags to NERDTree
-" let g:webdevicons_enable_nerdtree = 1
+let g:webdevicons_enable_nerdtree = 1
 " adding to vim-airline's tabline
 let g:webdevicons_enable_airline_tabline = 1
 " adding to vim-airline's statusline
@@ -321,6 +299,26 @@ let g:webdevicons_enable_airline_statusline = 1
 let g:webdevicons_enable_startify = 1
 " Adding the custom source to denite
 " let g:webdevicons_enable_denite = 1
+" turn on/off file node glyph decorations (not particularly useful)
+let g:WebDevIconsUnicodeDecorateFileNodes = 1
+" use double-width(1) or single-width(0) glyphs
+" only manipulates padding, has no effect on terminal or set(guifont) font
+let g:WebDevIconsUnicodeGlyphDoubleWidth = 1
+" whether or not to show the nerdtree brackets around flags
+let g:webdevicons_conceal_nerdtree_brackets = 1
+" the amount of space to use after the glyph character (default ' ')
+let g:WebDevIconsNerdTreeAfterGlyphPadding = '  '
+" Force extra padding in NERDTree so that the filetype icons line up vertically
+let g:WebDevIconsNerdTreeGitPluginForceVAlign = 1
+let g:WebDevIconsOS = 'Darwin'
+" set a byte character marker (BOM) utf-8 symbol when retrieving file encoding
+" disabled by default with no value
+let g:WebDevIconsUnicodeByteOrderMarkerDefaultSymbol = ''
+" enable folder/directory glyph flag (disabled by default with 0)
+let g:WebDevIconsUnicodeDecorateFolderNodes = 1
+" change the default character when no match found
+let g:WebDevIconsUnicodeDecorateFileNodesDefaultSymbol = 'ƛ'
+
 
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_toc_autofit = 0
@@ -417,29 +415,55 @@ let g:tagbar_type_go = {
 " let g:closetag_html_style = 1
 
 " 侧边栏，代替Nerdtree
-call defx#custom#column('size','')
+" call defx#custom#column('size','')
 call defx#custom#column('filename', {
-      \ 'min_width': 40,
-      \ 'max_width': 100,
-      \ })
+    \ 'min_width': 20,
+    \ 'max_width': 100,
+    \ })
 call defx#custom#column('mark', {
-      \ 'readonly_icon': '',
-      \ 'selected_icon': '',
-      \ })
+    \ 'readonly_icon': '',
+    \ 'selected_icon': '',
+    \ })
+let g:defx_git#indicators = {
+    \ 'Modified'  : '✹',
+    \ 'Staged'    : '✚',
+    \ 'Untracked' : '✭',
+    \ 'Renamed'   : '➜',
+    \ 'Unmerged'  : '═',
+    \ 'Ignored'   : '☒',
+    \ 'Deleted'   : '✖',
+    \ 'Unknown'   : '?'
+    \ }
+let g:defx_git#column_length = 1
+let g:defx_git#show_ignored = 0
+let g:defx_git#raw_mode = 0
+
+let g:defx_icons_enable_syntax_highlight = 1
+let g:defx_icons_column_length = 1
+let g:defx_icons_directory_icon = ''
+let g:defx_icons_mark_icon = '*'
+let g:defx_icons_parent_icon = ''
+let g:defx_icons_default_icon = ''
+let g:defx_icons_directory_symlink_icon = ''
+" options below are applicable only when using "tree" feature
+let g:defx_icons_root_opened_tree_icon = ''
+let g:defx_icons_nested_opened_tree_icon = ''
+let g:defx_icons_nested_closed_tree_icon = ''
 call defx#custom#option('_',{
-      \ 'columns'   : 'icons:indent:filename:type:size',
-      \ 'split'     : 'floating',
-      \ 'direction' : 'topleft',
-      \ 'winwidth'  : 45,
-      \ 'show_ignored_files': 0,
-      \ 'buffer_name': '',
-      \ 'toggle': 1,
-      \ 'resume': 1,
-      \ })
+    \ 'columns'   : 'indent:icons:filename:type:size',
+    \ 'split'     : 'floating',
+    \ 'direction' : 'topleft',
+    \ 'winwidth'  : 120,
+    \ 'show_ignored_files': 0,
+    \ 'buffer_name': '[defx]',
+    \ 'auto_cd': 0,
+    \ 'toggle': 1,
+    \ 'resume': 1,
+    \ })
 
 
 " 打开目录时自动开启defx
-" TODO: 此处如果打开目录时使用 `floating` 窗口，将窗口无法取得焦点，所以指定`vertical`方式
+" FIXME: 此处如果打开目录时使用 `floating` 窗口，将窗口无法取得焦点，所以指定`vertical`方式
 augroup ft_defx
     au!
     au VimEnter * sil! au! FileExplorer *
@@ -471,10 +495,12 @@ function! DefxSettings() abort
 
   " Define mappings
   nnoremap <silent><buffer>m :call DefxContextMenu()<CR>
-  nnoremap <silent><buffer><expr> <CR> defx#do_action('multi',·['drop',·'quit'])
+  nnoremap <silent><buffer><expr> <CR> defx#is_directory() ? defx#do_action('open_directory') : defx#do_action('multi', ['drop', 'quit'])
   nnoremap <silent><buffer><expr> o defx#is_directory() ? defx#do_action('open_or_close_tree') : defx#do_action('multi', ['drop', 'quit'])
+  nnoremap <silent><buffer><expr> O defx#do_action('open_tree_recursive')
   nnoremap <silent><buffer><expr> vs defx#do_action('multi', [['drop', 'vsplit'], 'quit'])
   nnoremap <silent><buffer><expr> sp defx#do_action('multi', [['drop', 'split'], 'quit'])
+  nnoremap <silent><buffer><expr> .. defx#do_action('cd', ['..'])
   " nnoremap <silent><buffer><expr> t defx#do_action('open_directory')
   nnoremap <silent><buffer><expr> c defx#do_action('copy')
   " nnoremap <silent><buffer><expr> m defx#do_action('move')
@@ -483,8 +509,8 @@ function! DefxSettings() abort
   " nnoremap <silent><buffer><expr> E defx#do_action('open', 'vsplit')
   nnoremap <silent><buffer><expr> P defx#do_action('open', 'pedit')
   nnoremap <silent><buffer><expr> l defx#do_action('open_or_close_tree')
-  " nnoremap <silent><buffer><expr> K defx#do_action('new_directory')
-  " nnoremap <silent><buffer><expr> N defx#do_action('new_file')
+  nnoremap <silent><buffer><expr> K defx#do_action('new_directory')
+  nnoremap <silent><buffer><expr> N defx#do_action('new_file')
   nnoremap <silent><buffer><expr> M defx#do_action('new_multiple_files')
   " nnoremap <silent><buffer><expr> C defx#do_action('toggle_columns','git:mark:filename:type:size:time')
   " nnoremap <silent><buffer><expr> S defx#do_action('toggle_sort', 'time')
@@ -493,9 +519,8 @@ function! DefxSettings() abort
   nnoremap <silent><buffer><expr> ! defx#do_action('execute_command')
   nnoremap <silent><buffer><expr> x defx#do_action('execute_system')
   nnoremap <silent><buffer><expr> yy defx#do_action('yank_path')
-  nnoremap <silent><buffer><expr> . defx#do_action('toggle_ignored_files')
+  nnoremap <silent><buffer><expr> h defx#do_action('toggle_ignored_files')
   nnoremap <silent><buffer><expr> ; defx#do_action('repeat')
-  nnoremap <silent><buffer><expr> h defx#is_opened_tree() ? defx#do_action('close_tree') :defx#do_action('cd', ['..'])
   nnoremap <silent><buffer><expr> ~ defx#do_action('cd')
   nnoremap <silent><buffer><expr> q defx#do_action('quit')
   nnoremap <silent><buffer><expr> <Space> defx#do_action('toggle_select') . 'j'
@@ -507,45 +532,7 @@ function! DefxSettings() abort
   nnoremap <silent><buffer><expr> cd defx#do_action('change_vim_cwd')
 endfunction
 
-let g:defx_git#indicators = {
-  \ 'modified'  : '✹',
-  \ 'staged'    : '✚',
-  \ 'untracked' : '✭',
-  \ 'renamed'   : '➜',
-  \ 'unmerged'  : '═',
-  \ 'ignored'   : '☒',
-  \ 'deleted'   : '✖',
-  \ 'unknown'   : '?',
-  \ }
-let g:defx_git#column_length = 1
-let g:defx_git#show_ignored = 0
-let g:defx_git#raw_mode = 1
 
-let g:defx_icons_enable_syntax_highlight = 1
-let g:defx_icons_column_length = 2
-let g:defx_icons_directory_icon = ''
-let g:defx_icons_mark_icon = '*'
-let g:defx_icons_parent_icon = ''
-let g:defx_icons_default_icon = ''
-let g:defx_icons_directory_symlink_icon = ''
-" options below are applicable only when using "tree" feature
-let g:defx_icons_root_opened_tree_icon = ''
-let g:defx_icons_nested_opened_tree_icon = ''
-let g:defx_icons_nested_closed_tree_icon = ''
-" " autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'defx') | quit | endif
-
-" Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
-" nmap <silent> <F3> :NERDTreeToggle <CR><ESC>
-" let NERDTreeWinSize=30
-" let NERDTreeIgnore=['\.pyc$', '\.pyo$', '\.swp$', '\~$', '.git$[[dir]]', '.svn$[[dir]]']
-" let NERDTreeShowHidden=1
-" let g:NERDTreeDirArrowExpandable = '▸'
-" let g:NERDTreeDirArrowCollapsible = '▾'
-" " 当只有NerdTree窗口时,自动关闭
-" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-" " 打开目录时自动开启NerdTree
-" autocmd StdinReadPre * let s:std_in=1
-" autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
 
 let g:gitgutter_map_keys = 0
 let g:gitgutter_enabled = 1
