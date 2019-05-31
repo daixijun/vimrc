@@ -75,7 +75,7 @@
           ],
           "plugins": {
             "jedi_completion": {
-              "enabled": true
+              "enabled": false
             },
             "jedi_hover": {
               "enabled": true

@@ -8,17 +8,18 @@ if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
     autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 " Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
+
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'yianwillis/vimcdoc'       " VIM 中文help
 Plug 'jiangmiao/auto-pairs'     " 括号自动补全
 Plug 'sheerun/vim-polyglot'     " 语法高亮插件
 Plug 'Yggdroot/indentLine'      " 缩进线
 Plug 'mhinz/vim-startify'       " 启动界面
+Plug 'junegunn/vim-easy-align'  " 快速对齐
 Plug 'ntpeters/vim-better-whitespace'  " 清除行尾无效空格
 Plug 'terryma/vim-multiple-cursors'     " 多光标操作
 Plug 'editorconfig/editorconfig-vim'     " 支持editorconfig
 Plug 'tpope/vim-surround'       " 快速替换tag或引号
-" Plug 'justinmk/vim-sneak'       " 快速跳转工具
 Plug 'pearofducks/ansible-vim'  " ansible
 Plug 'saltstack/salt-vim'       " SaltStack
 Plug 'cespare/vim-toml'
@@ -39,8 +40,6 @@ Plug 'kristijanhusak/defx-git'
 Plug 'kristijanhusak/defx-icons'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-" Plug 'Shougo/denite.nvim', { 'do': ':UpdateRemotePlugins' } 		" 快速搜索工具
-" Plug 'Shougo/neomru.vim'
 Plug 'ekalinin/Dockerfile.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'   " 左边实现显示git变动
@@ -49,6 +48,7 @@ Plug 'scrooloose/nerdcommenter'  " 快速注释
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': 'go' }   " Golang
 Plug 'hashivim/vim-terraform', { 'for': 'terraform' }             " Terraform
 Plug 'juliosueiras/vim-terraform-completion', { 'for': 'terraform' }  " Terraform 自动补全
+Plug 'christoomey/vim-tmux-navigator'  " 集成Tmux
 call plug#end()
 
 
@@ -81,10 +81,9 @@ autocmd! bufwritepost $MYVIMRC source %   " 更改配置文件后 自动加载
 set clipboard+=unnamed        " 启用共享粘贴板
 set mouse-=a                 " 禁用鼠标
 set backspace=indent,eol,start  " 退格键
-" 字符编码
 set termencoding=utf-8
 set encoding=utf-8           " 设置新文件的编码为 UTF-8
-" set fileencoding=utf-8
+set fileencoding=utf-8
 set fileencodings=utf-8,cp936,gb18030,gbk,gb2312
 set vb t_vb=                 " 关闭提示音
 set autochdir                " 设定文件浏览器目录为当前目录
@@ -131,6 +130,31 @@ set signcolumn=yes
 highlight ColorColumn ctermbg=233   " 高亮标识线
 
 
+" 打开自动定位到最后编辑的位置, 需要确认 .viminfo 当前用户可写
+if has("autocmd")
+    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
+augroup ft_python
+    autocmd BufRead,BufNewFile *.py,*.pyw set filetype=python
+    autocmd FileType python setlocal shiftwidth=4 tabstop=4 softtabstop=4 expandtab
+augroup end
+
+augroup ft_go
+    autocmd BufRead,BufNewFile *.go set filetype=go
+    autocmd FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 noexpandtab
+augroup end
+
+augroup ft_yaml
+    " autocmd BufRead,BufNewFile *.yaml,*.yml filetype=yaml
+    autocmd FileType yaml setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+augroup end
+
+augroup ft_json
+    autocmd BufRead,BufNewFile *.json filetype=json
+    autocmd FileType json setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+augroup end
+
 " ==================
 " Mapping 快捷键
 " =================
@@ -162,17 +186,17 @@ nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
+  " if (index(['vim','help'], &filetype) >= 0)
+  "   execute 'h '.expand('<cword>')
+  " else
     call CocAction('doHover')
-  endif
+  " endif
 endfunction
 
 " Highlight symbol under cursor on CursorHold
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
-augroup mygroup
+augroup coc
   autocmd!
   " Setup formatexpr specified filetype(s).
   autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
@@ -268,10 +292,6 @@ inoremap <C-k>  <C-p>
 " imap <c-l> <ESC>A
 " imap <c-e> <ESC>A
 
-" 打开自动定位到最后编辑的位置, 需要确认 .viminfo 当前用户可写
-if has("autocmd")
-    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-endif
 
 let g:onedark_terminal_italics = 1
 let g:onedark_termcolors = 256
@@ -329,14 +349,14 @@ let g:vim_markdown_json_frontmatter = 1
 let g:vim_markdown_new_list_item_indent = 2
 let g:vim_markdown_autowrite = 1
 
-let g:indentLine_setColors = 0
-let g:indentLine_color_term = 239
-let g:indentLine_bgcolor_term = 202
+let g:indentLine_setColors = 1
+" let g:indentLine_color_term = 239
+" let g:indentLine_bgcolor_term = 202
 let g:indentLine_enabled = 1
 " let g:indentLine_char = 'c'
 let g:indentLine_concealcursor = 'inc'
 " let g:indentLine_char = 'c'
-" let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 let g:indentLine_conceallevel = 2
 let g:indentLine_color_dark = 1
 
