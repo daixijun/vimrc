@@ -136,12 +136,12 @@ if has("autocmd")
 endif
 
 augroup ft_python
-    autocmd BufRead,BufNewFile *.py,*.pyw set filetype=python
+    " autocmd BufRead,BufNewFile *.py,*.pyw set filetype=python
     autocmd FileType python setlocal shiftwidth=4 tabstop=4 softtabstop=4 expandtab
 augroup end
 
 augroup ft_go
-    autocmd BufRead,BufNewFile *.go set filetype=go
+    " autocmd BufRead,BufNewFile *.go set filetype=go
     autocmd FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4 noexpandtab
 augroup end
 
@@ -151,7 +151,7 @@ augroup ft_yaml
 augroup end
 
 augroup ft_json
-    autocmd BufRead,BufNewFile *.json filetype=json
+    " autocmd BufRead,BufNewFile *.json filetype=json
     autocmd FileType json setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 augroup end
 

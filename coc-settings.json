@@ -6,6 +6,8 @@
   "suggest.noselect": false,
   "suggest.minTriggerInputLength": 1,
   "suggest.acceptSuggestionOnCommitCharacter": true,
+  "suggest.floatEnable": true,
+  "suggest.enablePreview": false,
   "diagnostic.messageTarget": "float",
   "diagnostic.refreshOnInsertMode": true,
   "diagnostic.signOffset": 9999999,
@@ -37,8 +39,6 @@
   "languageserver": {
     "golang": {
       "command": "gopls",
-      // "args": ["serve"],
-      // "trace.server": "verbose",
       "enable": true,
       "rootPatterns": [
         "go.mod",
@@ -51,7 +51,7 @@
       ]
     },
     "python": {
-      "command": "python3",
+      "command": "/usr/local/bin/python3",
       "args": [
         "-mpyls",
         "-vv",
