@@ -153,6 +153,7 @@ augroup end
 augroup ft_json
     " autocmd BufRead,BufNewFile *.json filetype=json
     autocmd FileType json setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+    autocmd FileType json syntax match Comment +\/\/.\+$+
 augroup end
 
 " ==================
@@ -168,6 +169,7 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~ '\s'
 endfunction
 
+command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
 " 使用<TAB> 键触发COC补全
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? "\<C-n>" :
@@ -211,9 +213,9 @@ nmap <leader>rn <Plug>(coc-rename)
 vmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
 " Show all diagnostics
-" nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+nnoremap <silent> <leader>ca  :<C-u>CocList diagnostics<cr>
 " " Manage extensions
-" nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+nnoremap <silent> <leader>ce  :<C-u>CocList extensions<cr>
 " " Show commands
 " nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
 " " Find symbol of current document
@@ -229,16 +231,16 @@ nmap <leader>f  <Plug>(coc-format-selected)
 "
 "
 " COC Snippets
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? coc#_select_confirm() :
-      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
+" inoremap <silent><expr> <TAB>
+"       \ pumvisible() ? coc#_select_confirm() :
+"       \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+"       \ <SID>check_back_space() ? "\<TAB>" :
+"       \ coc#refresh()
+"
+" function! s:check_back_space() abort
+"   let col = col('.') - 1
+"   return !col || getline('.')[col - 1]  =~# '\s'
+" endfunction
 " Use <C-l> for trigger snippet expand.
 imap <C-l> <Plug>(coc-snippets-expand)
 " Use <C-j> for select text for visual placeholder of snippet.
@@ -471,7 +473,7 @@ let g:defx_icons_nested_opened_tree_icon = ''
 let g:defx_icons_nested_closed_tree_icon = ''
 call defx#custom#option('_',{
     \ 'columns'   : 'indent:icons:filename:type:size',
-    \ 'split'     : 'floating',
+    \ 'split'     : 'vertical',
     \ 'direction' : 'topleft',
     \ 'winwidth'  : 45,
     \ 'show_ignored_files': 0,

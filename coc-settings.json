@@ -18,7 +18,14 @@
   "codeLens.enable": true,
   "coc.preferences.formatOnSaveFiletypes":[
     "python",
-    "go"
+    "go",
+    "json",
+    "yaml",
+    "markdown",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
   ],
   "python.jediEnabled": false,
   "python.pipenvPath": "/usr/local/bin/pipenv",
@@ -66,16 +73,13 @@
       "settings": {
         "pyls": {
           "enable": true,
-          "trace": {
-            "server": "verbose"
-          },
           "commandPath": "",
           "configurationSources": [
-            "pycodestyle"
+            "pydocstyle"
           ],
           "plugins": {
             "jedi_completion": {
-              "enabled": false
+              "enabled": true
             },
             "jedi_hover": {
               "enabled": true
