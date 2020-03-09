@@ -31,7 +31,7 @@ Plug 'joshdick/onedark.vim'
 Plug 'bling/vim-airline'        " 状态栏
 Plug 'vim-airline/vim-airline-themes'
 Plug 'ryanoasis/vim-devicons'
-Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install() } }    " 依赖Nodejs && yarn
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install() }, 'branch': 'release' }    " 依赖Nodejs && yarn
 Plug 'easymotion/vim-easymotion'
 Plug 'godlygeek/tabular'
 Plug 'majutsushi/tagbar'
@@ -440,7 +440,7 @@ let g:tagbar_type_go = {
 " call defx#custom#column('size','')
 call defx#custom#column('filename', {
     \ 'min_width': 20,
-    \ 'max_width': 100,
+    \ 'max_width': 80,
     \ })
 call defx#custom#column('mark', {
     \ 'readonly_icon': '',
@@ -475,7 +475,7 @@ call defx#custom#option('_',{
     \ 'columns'   : 'indent:icons:filename:type:size',
     \ 'split'     : 'vertical',
     \ 'direction' : 'topleft',
-    \ 'winwidth'  : 45,
+    \ 'winwidth'  : 40,
     \ 'show_ignored_files': 0,
     \ 'buffer_name': '[defx]',
     \ 'auto_cd': 0,
@@ -484,23 +484,35 @@ call defx#custom#option('_',{
     \ })
 
 
-" 打开目录时自动开启defx
-" FIXME: 此处如果打开目录时使用 `floating` 窗口，将窗口无法取得焦点，所以指定`vertical`方式
-augroup ft_defx
-    au!
-    au VimEnter * sil! au! FileExplorer *
-    au BufEnter * if s:isdir(expand('%')) | bd | exe 'Defx -split=vertical' | endif
-augroup END
 
 fu! s:isdir(dir) abort
     return !empty(a:dir) && (isdirectory(a:dir) ||
        \ (!empty($SYSTEMDRIVE) && isdirectory('/'.tolower($SYSTEMDRIVE[0]).a:dir)))
 endfu
+
+function! s:open_defx_if_directory()
+  let l:full_path = expand(expand('%:p'))
+  if isdirectory(l:full_path)
+    Defx -auto-cd `expand('%:p')` -search=`expand('%:p')`
+  endif
+endfunction
+
 " 只有defx窗口时自动关闭
 autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'defx') | quit | endif
+
 nnoremap <silent> <leader>d :Defx<Cr>
-autocmd FileType defx DisableWhitespace
-autocmd FileType defx call DefxSettings()
+
+" 打开目录时自动开启defx
+" FIXME: 此处如果打开目录时使用 `floating` 窗口，将窗口无法取得焦点，所以指定`vertical`方式
+augroup ft_defx
+    autocmd!
+    autocmd VimEnter * sil! au! FileExplorer *
+    autocmd FileType defx DisableWhitespace
+    autocmd BufEnter * call s:open_defx_if_directory()
+    autocmd FileType defx call DefxSettings()
+    " au BufEnter * if s:isdir(expand('%')) | bd | call s:open_defx_if_directory() | endif
+    " au BufEnter * if s:isdir(expand('%')) | bd | exe 'Defx -split=vertical' | endif
+augroup end
 
 function! DefxContextMenu() abort
   let l:actions = ['new_file', 'new_directory', 'rename', 'copy', 'move', 'paste', 'remove']
@@ -514,11 +526,15 @@ function! DefxSettings() abort
   setl nonumber
   setl norelativenumber
   setl listchars=
+  setl signcolumn=
+  setl winfixwidth
 
   " Define mappings
   nnoremap <silent><buffer>m :call DefxContextMenu()<CR>
-  nnoremap <silent><buffer><expr> <CR> defx#is_directory() ? defx#do_action('open_directory') : defx#do_action('multi', ['drop', 'quit'])
-  nnoremap <silent><buffer><expr> o defx#is_directory() ? defx#do_action('open_or_close_tree') : defx#do_action('multi', ['drop', 'quit'])
+  " nnoremap <silent><buffer><expr> <CR> defx#is_directory() ? defx#do_action('open_directory') : defx#do_action('multi', ['drop', 'quit'])
+  nnoremap <silent><buffer><expr> <CR> defx#is_directory() ? defx#do_action('cd', defx#get_candidate().action__path) : defx#do_action('multi', ['drop', 'quit'])
+  nnoremap <silent><buffer><expr> o defx#is_directory() ? defx#do_action('open_or_close_tree') : defx#do_action('drop')
+  " nnoremap <silent><buffer><expr> o defx#is_directory() ? defx#do_action('open_or_close_tree') : defx#do_action('multi', ['drop', 'quit'])
   nnoremap <silent><buffer><expr> O defx#do_action('open_tree_recursive')
   nnoremap <silent><buffer><expr> vs defx#do_action('multi', [['drop', 'vsplit'], 'quit'])
   nnoremap <silent><buffer><expr> sp defx#do_action('multi', [['drop', 'split'], 'quit'])
