@@ -20,6 +20,7 @@ Plug 'ntpeters/vim-better-whitespace'  " 清除行尾无效空格
 Plug 'terryma/vim-multiple-cursors'     " 多光标操作
 Plug 'editorconfig/editorconfig-vim'     " 支持editorconfig
 Plug 'tpope/vim-surround'       " 快速替换tag或引号
+Plug 'Glench/Vim-Jinja2-Syntax'  " Vim-Jinja2-Syntax
 Plug 'pearofducks/ansible-vim'  " ansible
 Plug 'saltstack/salt-vim'       " SaltStack
 Plug 'cespare/vim-toml'
@@ -127,7 +128,8 @@ set updatetime=100
 set shortmess+=c
 " always show signcolumns
 set signcolumn=yes
-highlight ColorColumn ctermbg=233   " 高亮标识线
+" 高亮标识线
+highlight ColorColumn ctermbg=233
 
 
 " 打开自动定位到最后编辑的位置, 需要确认 .viminfo 当前用户可写
@@ -302,6 +304,9 @@ let g:onedark_hide_endofbuffer = 1
 " Ansible
 let g:ansible_template_syntaxes = { '*.rb.j2': 'ruby', '*.py.j2': 'python', '*.service.j2': 'systemd' }
 
+" SaltStack
+" 0: Use the Django syntax file.
+" 1: Use the Jinja syntax file, regardless of whether it exists or not.
 let g:sls_use_jinja_syntax = 1
 
 let g:airline_theme = 'onedark'
